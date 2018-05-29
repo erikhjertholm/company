@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Nerdesøk</title>
+
+    <!-- here's the sites list. -->
+    <script id="data">
+        window.sites = [
+		"ncbi.nlm.nih.gov/pubmed/",
+            "sciencedaily.com",
+            "sciencedirect.com",
+            "sciencedump.com",
+            "sciencealert.com",
+            "sciencenews.com",
+            "elsevier.com",
+            "newscientist.com",
+            "nytimes.com/section/science",
+            "popsci.com",
+            "sciencefriday.com",
+            "scientificamerican.com",
+            "bbc.com/news/science_and_environment",
+            "sciencemag.org",
+            "phys.org",
+            "ted.com",
+            "futurity.org",
+            "wired.com/category/science/",
+            "nature.com",
+            "symmetrymagazine.org",
+            "discovermagazine.com",
+            "nationalgeographic.com",
+            "spectrum.ieee.org",
+            "eurekalert.org",
+            "technologyreview.com",
+            "Forskning.no",
+            "mayoclinic.org",
+	    "nrk.no/viten/",
+	    "spectrum.ieee.org",
+	    "quora.com",
+        ];
+    </script>
+
+    <style>
+        .btn {
+            background: #3498db;
+            background-image: -webkit-linear-gradient(top, #3498db, #2980b9);
+            background-image: -moz-linear-gradient(top, #3498db, #2980b9);
+            background-image: -ms-linear-gradient(top, #3498db, #2980b9);
+            background-image: -o-linear-gradient(top, #3498db, #2980b9);
+            background-image: linear-gradient(to bottom, #3498db, #2980b9);
+            -webkit-border-radius: 10;
+            -moz-border-radius: 10;
+            border-radius: 10px;
+            font-family: Arial;
+            color: #ffffff;
+            font-size: 20px;
+            padding: 10px 20px 10px 20px;
+            text-decoration: none;
+            cursor: hand;
+        }
+
+        .btn:hover {
+            background: #3cb0fd;
+            background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
+            background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
+            background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
+            background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
+            background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+            text-decoration: none;
+        }
+
+        .input-text {
+            border: 1px solid #3cb0fd;
+            border-radius: 10px;
+            font-size: 20px;
+            padding: 10px 15px;
+            margin-right: 4px;
+            width: 280px;
+        }
+
+        .input-text:focus {
+            outline: none;
+        }
+
+        .container {
+            width: 800px;
+            margin: 0 auto;
+            padding-top: 67px;
+        }
+
+        #sitesFilter {
+            margin: 0 auto;
+            width: 40%;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+
+        .alert-info {
+            color: #31708f;
+            background-color: #d9edf7;
+            border-color: #bce8f1;
+        }
+    </style>
+  </head>
+  <body>
+      <div class="container">
+
+            <h1><center>Nerdesøk</center></h1>
+            <div style="text-align: center;">
+                <input type="text" id="searchTerm" class="input-text" /><a onclick="go()" href="javascript:void();" class="btn">GO!</a>
+            </div>
+
+            <br>
+
+            <div class="alert alert-info" role="alert"> 
+                This is a google search generator that exclusively searches on the pages checked off below. Missing a page? Send a proposal to nerd@erikhjertholm.net 
+            </div>
+
+            <div id="sitesFilter"></div>
+
+    </div>
+
+    <!--
+        INSTRUCTION:
+
+        A. Create the sheet
+        1. Create a google spreadsheet
+        2. On the google drive file explorer, right click on the file and select Share
+        3. On the bottom right corner click Advanced
+        4. On the first row (above your name), click change
+        5. Select option: On - Anyone with the link
+        6. Change access right above the buttons to "Can Edit"
+        7. Click save
+        8. (optional) Under owner settings check "Prevent editors from changing ...". Then click save changes
+        9. click done
+        10. Open the sheet and look at the address bar.
+            You should have somethin like this: 
+                https://docs.google.com/spreadsheets/d/<SHEET_ID>/edit#gid=0
+            Copy the sheet id and paste it bellow
+        
+        B. Create auth key
+        1. Go to https://console.developers.google.com
+        2. Go to the library page and enable Sheets API (under G Suite APIs)
+        3. Expand the sidebar menu and select IAM & Admin > Service accounts
+        4. Create a new service account
+        5. Enter the service account name
+        6. Check the "Furnish a new private key"
+        7. Click Create button and save the file somewhere
+        8. Open the downloaded file
+        9. copy the client_email entry and paste it bellow
+        10. copy the private_key entry and paste it bellow
+
+        C. Create API key
+        1. on https://console.developers.google.com go to credentials page
+        2. On the create credentials dropdown button, select API key
+        3. Copy the key and paste it bellow
+
+        DONE!
+    -->
+
+    <script language="JavaScript" type="text/javascript" src="js/jsrsasign-4.1.4-all-min.js"></script>    
+    <script language="JavaScript" type="text/javascript" src="js/json-sans-eval-min.js"></script>    
+    <script language="JavaScript" type="text/javascript" src="js/jws-3.1.js"></script>    
+    <script>
+		var SHEET_ID = '1WTboutmjiP2JE9kLdeEw64KRJgMTaqTMSHPk__JMS54';
+        var API_KEY = 'AIzaSyD9iY7aCnXdVOyfXiLqDGhuAuRjcqc6h7s';
+        var ISS = 'testing@nerdesok.iam.gserviceaccount.com';
+        var PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----\DANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC+fOtdlWeXRqAX\nC3TRa2fETRUkq2PaMhDd6NtpHsq4wMJfTn5k73avsG3NLasvJ8Fbu7VooXZprjyh\nqKWBRZ+L6Z+GnkoVvGMLW1i5KeX9hVYfaPSF/SAX3e9/Vr2pgEFtnKL93KRZqAnQ\n7rLtwuuXlZFAOXDJEn31kUwkfAFF0Fr1YrSVjQZmlgQLvn6Mculk3wd40CgA0+2u\nwAcEJkkk35J5LulEuyOS6bVT9jZPpZ/k0QVb25wEcFV17hpAKWEshFApPiPdO0kF\nKlfVkyj0Kiqno6WN4aJljg8MlKAsCWtecoChgMkzgTrEc1K4H//8RFNyas57haIc\nfBpi9GGFAgMBAAECggEAD1u7DlyRcZz8I1+FF611PFqKrd4zus/2lC3GIv+ckLDZ\n+x01C6ZTB29OKxDXkIHAEUldIwaBqZumv9H9JiMa7gj0F8KDbqU1xyCiUquSI5Kw\nku+/Z141TDdUrAuuVxBENjY+3gEAL0phIDteqdThceNZRrha45teFIKWhQqKf7pd\nK1V68wngNjp2xKoCsAw2ul4rK105n5bqiSwQ1ylgEVljQE3c/PUi2cDvGcLdi0qu\n1V+aZrdXSHp1/qCYhHZoAElaRt+gsSHNnDKa/SpLS78+JASCuCM+hyg+ZqqaP+8w\nQ/bz9lJ1mhWwnZzDq4xGK5t8mvUgGxfr4Qyp4LKpAQKBgQDr1Cp0pnA7eyWWWxqs\ntD/egCZx3cAwMgPyIAKB/7521LE4SthIADrGMw9NbnMK5oiD7QNTgKjP70uoQHiv\nQYJZApvBfZg9MUT+JXSHebB+RGM+TqlcU5ZL0O48c0VRraglwo1TvfVcsS1Lzg1B\njvmjZskFEy856qk/rnj4FTfNUQKBgQDOx/JfsN11c71Q224rqiFF4AbNV/20IoEz\nK/lN0uGPhD2h/v+/jm1h4qxvhIVVvyWIfTVie5MD51Lfisuyc/L54uotYCujlSrf\nBzvDlGki7tSXTvc/HnygTJfNObivdfoqIaZj3TnXQy+QO1Jujbsccb5ZGyCwRIFa\nDLO7I9nz9QKBgAgFVlBTXNvZC2U6wgR/uPBjYWtcBG5fNR0mE4/CWAMIpuJoQUTp\npRYapHmYuRb00k3SYNuVM6im1ebqEnC7hKhsW0nQcL4cD+Go+nalH+ibgNicqkv2\nl9UKTSAHN6NYibCHFnFzs4WsjQLYBkFlkH4LP+kJRwDsR0dgMsMVTamRAoGANwEW\n5v9sGWcdL9n+11ydFzI9fPfwA6++AHetDFeRKpT5tBLZwwHG9OfQCKYOtb1v5Xuw\n7K6Eb+BjuhT4lFKlinUi58kSMqRmUAdjjWX4BZPUNx+JQ1//tMBLDQtSplHSpsxm\nr1/Ul/9GMq6lAcVvxWQ4RwmhS2Idqm+Ai8JAotUCgYBfN3KVEo3rQYhyf0z34tjJ\nfRR/e5sz4FvLzW9Qur1oLmifdNwuvpCGSj40JGC45YclLc83KE3fmnpnoxnohJ4F\nHZ3AqGfCOabxm+tOYbOfHqkkMi6h5wMf6VxHutWuSF//21xcjXJ30J5mGTAN1uwE\nCCiYx0JNqY6kBORvdS5h5A==\n-----END PRIVATE KEY-----\n';
+
+
+        var searchBox = document.getElementById("searchTerm");
+        document.addEventListener('DOMContentLoaded', function() {
+            var container = document.getElementById('sitesFilter');
+            window.sites.map(function(s, index, arr) {
+                var id = 'siteFilter-' + index;
+
+                var div = document.createElement('div');
+
+                var checkbox = document.createElement('input');
+                checkbox.type = "checkbox";
+                checkbox.name = "filter[]";
+                checkbox.className = "site-filter";
+                checkbox.value = s;
+                checkbox.id = id;
+                if(index < arr.length - 1) { // the last checkbox is not checked
+                    checkbox.checked = true;
+                }
+
+                var label = document.createElement('label');
+                label.htmlFor = id;
+                label.appendChild(document.createTextNode(s));
+
+                div.appendChild(checkbox);
+                div.appendChild(label);
+
+                container.appendChild(div);
+
+                searchBox.focus();
+            });
+        }, false);
+
+        function go() {
+            var searchTerm = encodeURI(searchBox.value);
+            var mainUrl = 'https://www.google.no/#safe=off&q=';
+            var googleUrl = mainUrl + searchTerm;
+
+            // get the sites filter
+            var sitesUrl = '';
+            var filters = document.getElementsByClassName('site-filter');
+            var i;
+            for( i = 0; i < filters.length; i++ ) {
+                if(filters[i].checked) {
+                    sitesUrl += "+site:" + filters[i].value + "+OR"
+                }
+            }
+
+            googleUrl += sitesUrl.replace(/\+OR$/, '');
+            window.open(googleUrl);
+
+            var pHeader = {'alg':'RS256','typ':'JWT'};
+            var sHeader = JSON.stringify(pHeader);
+
+            var pClaim = {};
+            pClaim.aud = "https://www.googleapis.com/oauth2/v3/token";
+            pClaim.scope = "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets";
+            pClaim.iss = ISS;
+            pClaim.exp = KJUR.jws.IntDate.get("now + 1hour");
+            pClaim.iat = KJUR.jws.IntDate.get("now");
+
+            var sClaim = JSON.stringify(pClaim);
+
+            var sJWS = KJUR.jws.JWS.sign(null, sHeader, sClaim, PRIVATE_KEY);
+
+            var XHR = new XMLHttpRequest();
+            var urlEncodedData = "";
+            var urlEncodedDataPairs = [];
+
+            urlEncodedDataPairs.push(encodeURIComponent("grant_type") + '=' + encodeURIComponent("urn:ietf:params:oauth:grant-type:jwt-bearer"));
+            urlEncodedDataPairs.push(encodeURIComponent("assertion") + '=' + encodeURIComponent(sJWS));
+            urlEncodedData = urlEncodedDataPairs.join('&').replace(/%20/g, '+');
+
+            // We define what will happen if the data are successfully sent
+            XHR.addEventListener('load', function(event) {
+                var response = JSON.parse(XHR.responseText);
+                var token = response["access_token"];
+
+                var sheetUrl = 'https://sheets.googleapis.com/v4/spreadsheets/' 
+                            + SHEET_ID + '/values/A1:B:append?valueInputOption=RAW'
+                            + '&key=' + API_KEY
+                            + '&access_token=' + token;
+
+                var now = new Date();
+                var day = ("0" + now.getDate()).slice(-2);
+                var month = ("0" + (now.getMonth() + 1)).slice(-2);
+                var today = (day) + "/" + (month) + "/" + now.getFullYear();
+
+                var data = {
+                    range: 'A1:B',
+                    majorDimension: 'ROWS',
+                    values: [[searchTerm, today]]
+                };
+
+                var http = new XMLHttpRequest();
+                http.open("POST", sheetUrl, true);
+                http.send(JSON.stringify(data));
+            });
+
+            // We define what will happen in case of error
+            XHR.addEventListener('error', function(event) {
+                debugger;
+                console.log('Oops! Something went wrong.');
+            });
+
+            XHR.open('POST', 'https://www.googleapis.com/oauth2/v3/token');
+            XHR.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            XHR.send(urlEncodedData);
+        }
+
+        document.getElementById("searchTerm")
+            .addEventListener("keyup", function(event) {
+                event.preventDefault();
+                if (event.keyCode == 13) {
+                    go();
+                }
+            });
+    </script>
+  </body>
+</html>
